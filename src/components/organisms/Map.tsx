@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import mapboxgl, { Map as MapboxMap } from "mapbox-gl";
+import mapboxgl, { Map as MapboxMap, NavigationControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { style } from "./style";
 import { MapContext } from "./MapContext";
@@ -33,6 +33,11 @@ export const Map: React.FC = () => {
 			zoom: 12,
 			style,
 		});
+
+		const nav = new NavigationControl({
+			visualizePitch: true,
+		});
+		map.addControl(nav, "top-left");
 
 		setMap(map);
 

@@ -1,6 +1,8 @@
 import React from "react";
 import { Button as ButtonBase } from "components/atoms";
 import styled from "styled-components";
+import { useMap } from "components/organisms";
+import { scenarios, setupScenario } from "scenarios";
 
 const Wrapper = styled.nav`
 	width: 300px;
@@ -27,25 +29,23 @@ const H3 = styled.h3`
  * Primary left nav of the app
  */
 export const Nav = () => {
+	const map = useMap();
+
 	return (
 		<Wrapper>
 			<h2 style={{ fontWeight: "normal", paddingLeft: "20px" }}>Scenarios</h2>
-			<Button style={{ borderTop: "1px solid darkgrey" }}>
-				<H3>Radio Tower</H3>
-				Air to ground
-			</Button>
-			<Button>
-				<H3>Lighthouse</H3>
-				Water to ground
-			</Button>
-			<Button>
-				<H3>Light the Beacons</H3>
-				Ground to Ground
-			</Button>
-			<Button>
-				<H3>Submarine</H3>
-				Bathymetric
-			</Button>
+			{scenarios.map((scenario, i) => (
+				<Button
+					key={scenario.title}
+					onClick={() => {
+						setupScenario(map, scenario);
+					}}
+					style={{ borderTop: i === 0 ? "1px solid #393d48" : undefined }}
+				>
+					<H3>{scenario.title}</H3>
+					{scenario.subtitle}
+				</Button>
+			))}
 		</Wrapper>
 	);
 };
