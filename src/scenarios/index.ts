@@ -1,5 +1,6 @@
 import { LngLatLike, Map } from "mapbox-gl";
-import { Position } from "geojson";
+import { Position, GeoJSON } from "geojson";
+import { getPixelsFromTile, getTileNames } from "lib/tileutils";
 import * as beacons from "./beacons";
 
 interface Scenario {
@@ -81,16 +82,18 @@ export const setupScenario = (map: Map, scenario: Scenario) => {
 		map.removeSource("ground-line");
 	}
 
+	const origin2destinationGeoJson: GeoJSON = {
+		type: "Feature",
+		properties: {},
+		geometry: {
+			type: "LineString",
+			coordinates: [scenario.source, scenario.destination],
+		},
+	};
+
 	map.addSource("ground-line", {
 		type: "geojson",
-		data: {
-			type: "Feature",
-			properties: {},
-			geometry: {
-				type: "LineString",
-				coordinates: [scenario.source, scenario.destination],
-			},
-		},
+		data: origin2destinationGeoJson,
 	});
 
 	map.addLayer({
@@ -105,5 +108,12 @@ export const setupScenario = (map: Map, scenario: Scenario) => {
 			"line-color": "red",
 			"line-width": 2,
 		},
+	});
+
+	const tilenames = getTileNames(origin2destinationGeoJson.geometry);
+	console.log(tilenames);
+
+	tilenames.forEach(tilename => {
+		getPixelsFromTile(tilename).then(pixels => console.log(pixels));
 	});
 };

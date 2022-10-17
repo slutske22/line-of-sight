@@ -27,10 +27,9 @@ export const Map: React.FC = () => {
 
 		const map = new MapboxMap({
 			container: "map",
-			center: [-157.8103446269198, 21.350181086214107],
-			// pitch: 75,
-			// bearing: -17,
-			zoom: 12,
+			center: { lng: 173.768832412135, lat: -40.99157323594519 },
+			zoom: 10,
+			bearing: -45,
 			style,
 		});
 
