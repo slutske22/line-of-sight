@@ -7,7 +7,6 @@ import { scenarios, setupScenario } from "scenarios";
 const Wrapper = styled.nav`
 	width: 300px;
 	height: 100%;
-	border: 1px solid black;
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;

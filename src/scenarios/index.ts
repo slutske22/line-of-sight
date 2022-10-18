@@ -1,6 +1,6 @@
 import { LngLatLike, Map } from "mapbox-gl";
 import { Position, GeoJSON } from "geojson";
-import { getPixelsFromTile, getTileNames } from "lib/tileutils";
+import { getDem, getPixelsFromTile, getTileNames } from "lib/tileutils";
 import * as beacons from "./beacons";
 
 interface Scenario {
@@ -113,7 +113,5 @@ export const setupScenario = (map: Map, scenario: Scenario) => {
 	const tilenames = getTileNames(origin2destinationGeoJson.geometry);
 	console.log(tilenames);
 
-	tilenames.forEach(tilename => {
-		getPixelsFromTile(tilename).then(pixels => console.log(pixels));
-	});
+	getDem(tilenames);
 };
