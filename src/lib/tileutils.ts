@@ -3,14 +3,15 @@ import { dem, tilename } from "dem";
 import { Geometry } from "geojson";
 import getPixels from "get-pixels";
 import { NdArray } from "ndarray";
+import { TILE_ZOOM } from "./constants";
 
 /**
  * Util function to get tilesnames for tiles that cover a given GeoJSON geometry
  */
 export const getTileNames = (geometry: Geometry) => {
 	const tiles = cover.tiles(geometry, {
-		min_zoom: 12,
-		max_zoom: 12,
+		min_zoom: TILE_ZOOM,
+		max_zoom: TILE_ZOOM,
 	});
 
 	return tiles;
@@ -52,3 +53,17 @@ export const getDem = async (tiles: number[][]) => {
 		})
 	);
 };
+
+/**
+ * Take in a projection point and return the tile coordinates { X, Y, Z } of that point
+ */
+export function getTileCoordOfProjectedPoint(projectedPoint: {
+	x: number;
+	y: number;
+}) {
+	return {
+		X: Math.floor(projectedPoint.x / 256),
+		Y: Math.floor(projectedPoint.y / 256),
+		Z: TILE_ZOOM,
+	};
+}
