@@ -1,11 +1,12 @@
 import { Position, GeoJSON } from "geojson";
 import SphericalMercator from "@mapbox/sphericalmercator";
-import { TILE_ZOOM } from "./constants";
+import { dem, tilename } from "dem";
 import {
 	getDem,
 	getTileCoordOfProjectedPoint,
 	getTileNames,
 } from "./tileutils";
+import { config } from "./config";
 
 const merc = new SphericalMercator({
 	size: 256,
@@ -32,8 +33,8 @@ export async function lineOfSight(start: Position, end: Position) {
 	 * Transform start and end LngLats into pixel values, according to
 	 * spherical mercator projection and defined zoom level
 	 */
-	const startPx = merc.px(start as [number, number], TILE_ZOOM);
-	const endPx = merc.px(end as [number, number], TILE_ZOOM);
+	const startPx = merc.px(start as [number, number], config.TILE_ZOOM);
+	const endPx = merc.px(end as [number, number], config.TILE_ZOOM);
 
 	console.log("startPx", startPx);
 	console.log("endPx", endPx);
@@ -59,11 +60,22 @@ export async function lineOfSight(start: Position, end: Position) {
 
 	const elevations = pixelsAlongLine.map(pixel => {
 		const { X, Y } = getTileCoordOfProjectedPoint(pixel);
+
+		const tile = dem[tilename(X, Y, config.TILE_ZOOM)];
+
 		const xyPositionOnTile = {
 			x: Math.floor(pixel.x) - X * 256,
 			y: Math.floor(pixel.y) - Y * 256,
 		};
+
+		const r = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 0);
+		const g = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 1);
+		const b = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 2);
+
+		const elevation = config.heightFunction(r, g, b);
+
+		return elevation;
 	});
 
-	console.log(pixelsAlongLine);
+	console.log(elevations);
 }

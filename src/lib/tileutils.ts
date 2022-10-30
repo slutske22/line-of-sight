@@ -3,15 +3,15 @@ import { dem, tilename } from "dem";
 import { Geometry } from "geojson";
 import getPixels from "get-pixels";
 import { NdArray } from "ndarray";
-import { TILE_ZOOM } from "./constants";
+import { config } from "./config";
 
 /**
  * Util function to get tilesnames for tiles that cover a given GeoJSON geometry
  */
 export const getTileNames = (geometry: Geometry) => {
 	const tiles = cover.tiles(geometry, {
-		min_zoom: TILE_ZOOM,
-		max_zoom: TILE_ZOOM,
+		min_zoom: config.TILE_ZOOM,
+		max_zoom: config.TILE_ZOOM,
 	});
 
 	return tiles;
@@ -25,7 +25,9 @@ export const getPixelsFromTile = ([x, y, z]: number[]): Promise<
 > => {
 	return new Promise((resolve, reject) => {
 		getPixels(
-			`https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${z}/${x}/${y}.png`,
+			config.TILES_URL.replace("{x}", x.toString())
+				.replace("{y}", y.toString())
+				.replace("{z}", z.toString()),
 			function (error, pixels) {
 				if (error) {
 					reject(error);
@@ -64,6 +66,6 @@ export function getTileCoordOfProjectedPoint(projectedPoint: {
 	return {
 		X: Math.floor(projectedPoint.x / 256),
 		Y: Math.floor(projectedPoint.y / 256),
-		Z: TILE_ZOOM,
+		Z: config.TILE_ZOOM,
 	};
 }
