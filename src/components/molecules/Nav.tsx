@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Button as ButtonBase } from "components/atoms";
 import styled from "styled-components";
-import { useMap } from "components/organisms";
+import { DataContext } from "components/organisms";
 import { scenarios, setupScenario } from "scenarios";
 
 const Wrapper = styled.nav`
-	width: 300px;
+	width: 260px;
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -28,7 +28,7 @@ const H3 = styled.h3`
  * Primary left nav of the app
  */
 export const Nav = () => {
-	const map = useMap();
+	const { map, setResults } = useContext(DataContext);
 
 	return (
 		<Wrapper>
@@ -37,7 +37,10 @@ export const Nav = () => {
 				<Button
 					key={scenario.title}
 					onClick={() => {
-						setupScenario(map, scenario);
+						setupScenario(map, scenario).then(results => {
+							console.log(results);
+							setResults(results);
+						});
 					}}
 					style={{ borderTop: i === 0 ? "1px solid #393d48" : undefined }}
 				>

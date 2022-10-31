@@ -3,7 +3,7 @@ import styled from "styled-components";
 import mapboxgl, { Map as MapboxMap, NavigationControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { style } from "./style";
-import { MapContext } from "./MapContext";
+import { DataContext } from "./DataContext";
 
 mapboxgl.accessToken =
 	"pk.eyJ1IjoiYWxleHlvdXNlZmlhbiIsImEiOiJjbDBod3MxeWowYjFwM2pwNTgzNmZheGd5In0.IcoiTPi2qbE1YxjC-LD-cw";
@@ -19,7 +19,7 @@ const MapWrapper = styled.div`
 export const Map: React.FC = () => {
 	const [mapReady, setMapReady] = useState(false);
 
-	const { setMap } = useContext(MapContext);
+	const { setMap } = useContext(DataContext);
 
 	useEffect(() => {
 		if (!mapReady) return;

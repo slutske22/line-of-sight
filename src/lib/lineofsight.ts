@@ -1,6 +1,8 @@
 import { Position, GeoJSON } from "geojson";
 import SphericalMercator from "@mapbox/sphericalmercator";
 import { dem, tilename } from "dem";
+import { Results } from "components";
+import length from "@turf/length";
 import {
 	getDem,
 	getTileCoordOfProjectedPoint,
@@ -13,10 +15,23 @@ const merc = new SphericalMercator({
 	antimeridian: true,
 });
 
+interface Options {
+	/**
+	 * Whether to calculate sub-zero heights, or treat as 0
+	 */
+	considerBathymetry?: boolean;
+}
+
 /**
  * Central library function.  Takes in 2 points
  */
-export async function lineOfSight(start: Position, end: Position) {
+export async function lineOfSight(
+	start: Position,
+	end: Position,
+	options?: Options
+): Promise<Results> {
+	const { considerBathymetry = false } = options ?? {};
+
 	const origin2destinationGeoJson: GeoJSON = {
 		type: "Feature",
 		properties: {},
@@ -25,6 +40,8 @@ export async function lineOfSight(start: Position, end: Position) {
 			coordinates: [start, end],
 		},
 	};
+
+	const distance = length(origin2destinationGeoJson) * 1000;
 
 	const tilenames = getTileNames(origin2destinationGeoJson.geometry);
 	await getDem(tilenames);
@@ -35,14 +52,6 @@ export async function lineOfSight(start: Position, end: Position) {
 	 */
 	const startPx = merc.px(start as [number, number], config.TILE_ZOOM);
 	const endPx = merc.px(end as [number, number], config.TILE_ZOOM);
-
-	console.log("startPx", startPx);
-	console.log("endPx", endPx);
-
-	console.log(
-		"the tile of the start point is",
-		getTileCoordOfProjectedPoint({ x: startPx[0], y: startPx[1] })
-	);
 
 	/**
 	 * Get every pixel value (whole number { x,  y } value) along the line
@@ -74,8 +83,13 @@ export async function lineOfSight(start: Position, end: Position) {
 
 		const elevation = config.heightFunction(r, g, b);
 
-		return elevation;
+		return considerBathymetry ? elevation : Math.max(0, elevation);
 	});
 
-	console.log(elevations);
+	return {
+		elevationProfile: elevations.map((height, i) => [
+			(i / elevations.length) * distance,
+			height,
+		]),
+	};
 }

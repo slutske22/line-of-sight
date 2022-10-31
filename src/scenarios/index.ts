@@ -1,6 +1,7 @@
 import { LngLatLike, Map } from "mapbox-gl";
 import { Position, GeoJSON } from "geojson";
 import { lineOfSight } from "lib/lineofsight";
+import { Results } from "components";
 import * as beacons from "./beacons";
 
 interface Scenario {
@@ -72,7 +73,10 @@ export const scenarios: Scenario[] = [
  * Util function to set up scene - fly to position, draw lines and icons, clean up
  * previous scene icons and lines
  */
-export const setupScenario = (map: Map, scenario: Scenario) => {
+export const setupScenario = async (
+	map: Map,
+	scenario: Scenario
+): Promise<Results> => {
 	map.flyTo(scenario.startingView);
 
 	const groundLine = map.getLayer("ground-line");
@@ -110,5 +114,6 @@ export const setupScenario = (map: Map, scenario: Scenario) => {
 		},
 	});
 
-	lineOfSight(scenario.source, scenario.destination);
+	const results = await lineOfSight(scenario.source, scenario.destination);
+	return results;
 };
