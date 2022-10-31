@@ -10,7 +10,7 @@ export const config = {
 	/**
 	 * The zoom level for which to retrieve the tiles
 	 */
-	TILE_ZOOM: 8,
+	TILE_ZOOM: 12,
 	/**
 	 * Function to transform an RGB pixel value into an elevation value, in meters
 	 */
