@@ -54,7 +54,7 @@ export const Footer: React.FC = () => {
 			{
 				type: "spline",
 				data: results.losLine,
-				color: "red",
+				color: results.los ? "green" : "red",
 			},
 		],
 	};
