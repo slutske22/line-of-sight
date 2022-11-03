@@ -1,15 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import { Map as MapboxMap } from "mapbox-gl";
-
-/**
- * Results object
- */
-export interface Results {
-	/**
-	 * Elevation profile data, as an array of [x,y] points
-	 */
-	elevationProfile: number[][];
-}
+import { Results } from "lib/lineofsight";
 
 export interface DataContextProps {
 	/**
@@ -53,7 +44,11 @@ export const MapContextProvider: React.FC<Props> = ({ children }: Props) => {
 	 * Initialize context with blank map, but will be replaced when the primary mapbox map loads
 	 */
 	const [map, setMap] = useState<MapboxMap>(undefined as unknown as MapboxMap);
-	const [results, setResults] = useState<Results>({ elevationProfile: [] });
+	const [results, setResults] = useState<Results>({
+		elevationProfile: [],
+		losLine: [],
+		los: undefined as unknown as boolean,
+	});
 
 	return (
 		<DataContext.Provider value={{ map, setMap, results, setResults }}>

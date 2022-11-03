@@ -1,7 +1,6 @@
 import { Position, GeoJSON } from "geojson";
 import SphericalMercator from "@mapbox/sphericalmercator";
 import { dem, tilename } from "dem";
-import { Results } from "components";
 import length from "@turf/length";
 import {
 	getDem,
@@ -20,6 +19,24 @@ interface Options {
 	 * Whether to calculate sub-zero heights, or treat as 0
 	 */
 	considerBathymetry?: boolean;
+}
+
+/**
+ * Results object
+ */
+export interface Results {
+	/**
+	 * Elevation profile data, as an array of [x,y] points
+	 */
+	elevationProfile: number[][];
+	/**
+	 * Direct line from origin to destination, as an array of [x,y] points
+	 */
+	losLine: number[][];
+	/**
+	 * Whether or not there is a direct line of sight from origin to destination
+	 */
+	los: boolean;
 }
 
 /**
@@ -86,10 +103,29 @@ export async function lineOfSight(
 		return considerBathymetry ? elevation : Math.max(0, elevation);
 	});
 
+	const elevationProfile = elevations.map((height, i) => [
+		(i / elevations.length) * distance,
+		height,
+	]);
+
+	const first = elevationProfile[0];
+	const last = elevationProfile[elevationProfile.length - 1];
+
+	const m = (first[1] - last[1]) / (first[0] - last[0]);
+
+	const losLine: number[][] = [];
+	for (let i = 0; i < elevationProfile.length; i++) {
+		losLine.push([
+			elevationProfile[i][0],
+			elevationProfile[0][1] + m * elevationProfile[i][0],
+		]);
+	}
+
+	const los = elevationProfile.some((point, i) => point[1] < losLine[i][1]);
+
 	return {
-		elevationProfile: elevations.map((height, i) => [
-			(i / elevations.length) * distance,
-			height,
-		]),
+		elevationProfile,
+		losLine,
+		los,
 	};
 }

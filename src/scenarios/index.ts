@@ -1,7 +1,6 @@
 import { LngLatLike, Map } from "mapbox-gl";
 import { Position, GeoJSON } from "geojson";
-import { lineOfSight } from "lib/lineofsight";
-import { Results } from "components";
+import { lineOfSight, Results } from "lib/lineofsight";
 import * as beacons from "./beacons";
 
 interface Scenario {

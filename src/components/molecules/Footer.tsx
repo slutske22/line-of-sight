@@ -51,6 +51,11 @@ export const Footer: React.FC = () => {
 				type: "spline",
 				data: results.elevationProfile,
 			},
+			{
+				type: "spline",
+				data: results.losLine,
+				color: "red",
+			},
 		],
 	};
 
