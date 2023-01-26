@@ -17,6 +17,10 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@turf/along": "^6.5.0",
+    "@turf/bearing": "^6.5.0",
+    "@turf/bezier-spline": "^6.5.0",
+    "@turf/helpers": "^6.5.0",
     "@turf/length": "^6.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.11.66",
@@ -52,6 +56,7 @@
     ]
   },
   "devDependencies": {
+    "@types/geojson": "^7946.0.10",
     "@types/get-pixels": "^3.3.2",
     "@types/highcharts": "^7.0.0",
     "@types/mapbox__sphericalmercator": "^1.2.0",

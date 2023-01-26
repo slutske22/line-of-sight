@@ -37,10 +37,7 @@ export const Nav = () => {
 				<Button
 					key={scenario.title}
 					onClick={() => {
-						setupScenario(map, scenario).then(results => {
-							console.log(results);
-							setResults(results);
-						});
+						setupScenario(map, scenario, setResults);
 					}}
 					style={{ borderTop: i === 0 ? "1px solid #393d48" : undefined }}
 				>

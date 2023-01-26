@@ -2,8 +2,9 @@ import { LngLatLike, Map } from "mapbox-gl";
 import { Position, GeoJSON } from "geojson";
 import { lineOfSight, Results } from "lib/lineofsight";
 import * as beacons from "./beacons";
+import { radiotower } from "./radiotower";
 
-interface Scenario {
+export interface Scenario {
 	/**
 	 * The display title of the scenario
 	 */
@@ -28,6 +29,20 @@ interface Scenario {
 	 * The destination point we are trying to calculate line of sight to
 	 */
 	destination: Position;
+	/**
+	 * Any special behavior the scenario should execute
+	 */
+	customBehavior?: (
+		map: Map,
+		setResults: (value: React.SetStateAction<Results>) => void
+	) => void;
+	/**
+	 * Code to clean up custom behavior
+	 */
+	cleanupCustomBehavior?: (
+		map: Map,
+		setResults: (value: React.SetStateAction<Results>) => void
+	) => void;
 }
 
 export const scenarios: Scenario[] = [
@@ -42,16 +57,7 @@ export const scenarios: Scenario[] = [
 		source: [173.6865235396258, -41.12975102937678],
 		destination: [173.80549394420922, -40.87416361138374],
 	},
-	{
-		title: "Radio Tower",
-		subtitle: "Air to Ground, in Motion",
-		startingView: {
-			center: [-157.8103446269198, 21.350181086214107],
-			zoom: 12,
-		},
-		source: beacons.source,
-		destination: beacons.destination,
-	},
+	radiotower,
 	{
 		title: "Lighthouse",
 		subtitle: "Water to Ground",
@@ -74,15 +80,22 @@ export const scenarios: Scenario[] = [
  */
 export const setupScenario = async (
 	map: Map,
-	scenario: Scenario
+	scenario: Scenario,
+	setResults: (value: React.SetStateAction<Results>) => void
 ): Promise<Results> => {
 	map.flyTo(scenario.startingView);
 
 	const groundLine = map.getLayer("ground-line");
+	const movingPathLine = map.getLayer("moving-path-line");
 
 	if (groundLine) {
 		map.removeLayer("ground-line");
 		map.removeSource("ground-line");
+	}
+
+	if (movingPathLine) {
+		map.removeLayer("moving-path-line");
+		map.removeSource("moving-path-line");
 	}
 
 	const origin2destinationGeoJson: GeoJSON = {
@@ -114,5 +127,12 @@ export const setupScenario = async (
 	});
 
 	const results = await lineOfSight(scenario.source, scenario.destination);
+
+	setResults(results);
+
+	if (scenario.customBehavior) {
+		scenario.customBehavior(map, setResults);
+	}
+
 	return results;
 };
