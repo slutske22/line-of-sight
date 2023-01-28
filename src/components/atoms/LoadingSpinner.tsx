@@ -1,6 +1,5 @@
 import React, { ImgHTMLAttributes } from "react";
 import styled from "styled-components";
-// @ts-expect-error because
 import LoadingSpinnerImg from "assets/images/loading-spinner.svg";
 
 export const LoadingSpinnerWrapper = styled.img`

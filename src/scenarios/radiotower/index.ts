@@ -1,22 +1,58 @@
 import { LineString, lineString } from "@turf/helpers";
-import { FeatureCollection, Polygon, Position } from "geojson";
+import { FeatureCollection, Point, Polygon, Position } from "geojson";
 import { Scenario } from "scenarios";
 import { geojson2flightpath } from "utils";
 import { GeoJSONSource, Marker } from "mapbox-gl";
 import bezier from "@turf/bezier-spline";
+import bbox from "@turf/bbox";
+import xyz from "xyz-affair";
+import { lineOfSight } from "lib/lineofsight";
+import { getDem } from "lib/tileutils";
+import { config } from "lib/config";
 import planepathjson from "./planepath.json";
-// @ts-expect-error this should work
 import PlaneIcon from "./plane-icon.png";
 
+/**
+ * Coordinates for the target destination
+ */
+const DESTINATION = [-157.7694392095103, 21.44933977381804];
+
+/**
+ * The GeoJSON path of the plane
+ */
 const planepath = planepathjson as unknown as FeatureCollection<
 	Polygon | LineString
 >;
 
 /**
+ * Target destination as geojson
+ */
+const destination: FeatureCollection<Point> = {
+	type: "FeatureCollection",
+	features: [
+		{
+			type: "Feature",
+			properties: {},
+			geometry: {
+				type: "Point",
+				coordinates: DESTINATION,
+			},
+		},
+	],
+};
+
+/**
+ * GeoJSON of all things that comprise area that needs tiles
+ */
+const allGeoJson: FeatureCollection = {
+	type: "FeatureCollection",
+	features: [...planepath.features, ...destination.features],
+};
+
+/**
  * First transform geojson into leaflet latlng array
  */
-const latLngs =
-	planepath.features[0].geometry.coordinates[0].reverse() as Position[];
+const latLngs = planepath.features[0].geometry.coordinates[0] as Position[];
 
 /**
  * Smooth out the path using turf bezier spline
@@ -24,6 +60,9 @@ const latLngs =
 const turfLineString = lineString(latLngs);
 const spline = bezier(turfLineString, { resolution: 100000 });
 
+/**
+ * Series of positions along the path used for animating position
+ */
 const positions = geojson2flightpath(
 	planepath as unknown as FeatureCollection<LineString>
 );
@@ -39,8 +78,11 @@ export const radiotower: Scenario = {
 		zoom: 12,
 	},
 	source: positions[0].position,
-	destination: [-157.7694392095103, 21.44933977381804],
-	customBehavior: (map, _setResults) => {
+	destination: DESTINATION,
+	customBehavior: async (map, setResults) => {
+		/**
+		 * Add GeoJSON of flight path to map
+		 */
 		map.addSource("moving-path-line", {
 			type: "geojson",
 			data: spline,
@@ -60,6 +102,20 @@ export const radiotower: Scenario = {
 			},
 		});
 
+		/**
+		 * Create GeoJSON of flight path, with detination, and get all tiles in that area
+		 */
+		const [minX, minY, maxX, maxY] = bbox(allGeoJson);
+		const tiles: { x: number; y: number; z: number }[] = xyz(
+			[
+				[minX, minY],
+				[maxX, maxY],
+			],
+			config.TILE_ZOOM
+		);
+
+		await getDem(tiles.map(({ x, y, z }) => [x, y, z]));
+
 		const el = document.createElement("div");
 		el.className = "plane-icon-wrapper";
 
@@ -77,7 +133,7 @@ export const radiotower: Scenario = {
 		/**
 		 * Continuously update path and LoS
 		 */
-		interval = setInterval(() => {
+		interval = setInterval(async () => {
 			/**
 			 * Set the position and rotation of the plane icon
 			 */
@@ -96,13 +152,17 @@ export const radiotower: Scenario = {
 					type: "LineString",
 					coordinates: [
 						positions[index].position as [number, number],
-						[-157.7694392095103, 21.44933977381804],
+						DESTINATION,
 					],
 				},
 			});
 
+			const result = await lineOfSight(positions[index].position, DESTINATION);
+
+			setResults(result);
+
 			index = index >= positions.length - 2 ? 0 : index + 1;
-		}, 100);
+		}, 300);
 	},
 	cleanupCustomBehavior: (_map, _setResults) => {
 		clearInterval(interval);

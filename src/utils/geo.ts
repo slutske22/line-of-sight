@@ -28,7 +28,7 @@ export const geojson2flightpath = (
 	 * Smooth out the path using turf bezier spline
 	 */
 	const turfLineString = lineString(latLngs);
-	const spline = bezier(turfLineString, { resolution: 100000 });
+	const spline = bezier(turfLineString, { resolution: 10000 });
 
 	/**
 	 * Resample and interpolate along polyline/polygon with n number of points

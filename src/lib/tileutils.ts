@@ -8,10 +8,10 @@ import { config } from "./config";
 /**
  * Util function to get tilesnames for tiles that cover a given GeoJSON geometry
  */
-export const getTileNames = (geometry: Geometry) => {
+export const getTileNames = (geometry: Geometry, zoom: number) => {
 	const tiles = cover.tiles(geometry, {
-		min_zoom: config.TILE_ZOOM,
-		max_zoom: config.TILE_ZOOM,
+		min_zoom: zoom,
+		max_zoom: zoom,
 	});
 
 	return tiles;
@@ -59,13 +59,16 @@ export const getDem = async (tiles: number[][]) => {
 /**
  * Take in a projection point and return the tile coordinates { X, Y, Z } of that point
  */
-export function getTileCoordOfProjectedPoint(projectedPoint: {
-	x: number;
-	y: number;
-}) {
+export function getTileCoordOfProjectedPoint(
+	projectedPoint: {
+		x: number;
+		y: number;
+	},
+	zoom: number
+) {
 	return {
 		X: Math.floor(projectedPoint.x / 256),
 		Y: Math.floor(projectedPoint.y / 256),
-		Z: config.TILE_ZOOM,
+		Z: zoom,
 	};
 }

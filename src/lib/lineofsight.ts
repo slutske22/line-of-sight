@@ -2,6 +2,7 @@ import { Position, GeoJSON } from "geojson";
 import SphericalMercator from "@mapbox/sphericalmercator";
 import { dem, tilename } from "dem";
 import length from "@turf/length";
+import { line } from "utils";
 import {
 	getDem,
 	getTileCoordOfProjectedPoint,
@@ -19,6 +20,10 @@ interface Options {
 	 * Whether to calculate sub-zero heights, or treat as 0
 	 */
 	considerBathymetry?: boolean;
+	/**
+	 * Zoom level to use when getting DEM and analyzing pixels
+	 */
+	tileZoom?: number;
 }
 
 /**
@@ -47,7 +52,8 @@ export async function lineOfSight(
 	end: Position,
 	options?: Options
 ): Promise<Results> {
-	const { considerBathymetry = false } = options ?? {};
+	const { considerBathymetry = false, tileZoom = config.TILE_ZOOM } =
+		options ?? {};
 
 	const origin2destinationGeoJson: GeoJSON = {
 		type: "Feature",
@@ -60,48 +66,45 @@ export async function lineOfSight(
 
 	const distance = length(origin2destinationGeoJson) * 1000;
 
-	const tilenames = getTileNames(origin2destinationGeoJson.geometry);
+	const tilenames = getTileNames(origin2destinationGeoJson.geometry, tileZoom);
 	await getDem(tilenames);
 
 	/**
 	 * Transform start and end LngLats into pixel values, according to
 	 * spherical mercator projection and defined zoom level
 	 */
-	const startPx = merc.px(start as [number, number], config.TILE_ZOOM);
-	const endPx = merc.px(end as [number, number], config.TILE_ZOOM);
+	const startPx = merc.px(start as [number, number], tileZoom);
+	const endPx = merc.px(end as [number, number], tileZoom);
 
 	/**
 	 * Get every pixel value (whole number { x,  y } value) along the line
 	 */
-	const pixelsAlongLine = [];
-	const run = endPx[0] - startPx[0];
-	const slope = (endPx[1] - startPx[1]) / run;
+	const pixelsAlongLine = line(startPx[0], startPx[1], endPx[0], endPx[1]);
 
-	for (let i = 0; i < run + 1; i++) {
-		pixelsAlongLine.push({
-			x: startPx[0] + i,
-			y: startPx[1] + Math.round(slope * i),
-		});
-	}
+	const elevations = pixelsAlongLine
+		.map(pixel => {
+			const { X, Y } = getTileCoordOfProjectedPoint(pixel, tileZoom);
 
-	const elevations = pixelsAlongLine.map(pixel => {
-		const { X, Y } = getTileCoordOfProjectedPoint(pixel);
+			const tile = dem[tilename(X, Y, tileZoom)];
 
-		const tile = dem[tilename(X, Y, config.TILE_ZOOM)];
+			const xyPositionOnTile = {
+				x: Math.floor(pixel.x) - X * 256,
+				y: Math.floor(pixel.y) - Y * 256,
+			};
 
-		const xyPositionOnTile = {
-			x: Math.floor(pixel.x) - X * 256,
-			y: Math.floor(pixel.y) - Y * 256,
-		};
+			if (!tile) {
+				return null;
+			}
 
-		const r = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 0);
-		const g = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 1);
-		const b = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 2);
+			const r = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 0);
+			const g = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 1);
+			const b = tile.get(xyPositionOnTile.x, xyPositionOnTile.y, 2);
 
-		const elevation = config.heightFunction(r, g, b);
+			const elevation = config.heightFunction(r, g, b);
 
-		return considerBathymetry ? elevation : Math.max(0, elevation);
-	});
+			return considerBathymetry ? elevation : Math.max(0, elevation);
+		})
+		.filter(result => result !== null) as number[];
 
 	const elevationProfile = elevations.map((height, i) => [
 		(i / elevations.length) * distance,
