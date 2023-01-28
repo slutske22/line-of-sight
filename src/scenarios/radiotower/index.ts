@@ -69,6 +69,7 @@ const positions = geojson2flightpath(
 
 let interval: NodeJS.Timeout;
 let index = 0;
+let marker: Marker;
 
 export const radiotower: Scenario = {
 	title: "Radio Tower",
@@ -126,7 +127,7 @@ export const radiotower: Scenario = {
 
 		el.appendChild(planeIcon);
 
-		const marker = new Marker(el)
+		marker = new Marker(el)
 			.setLngLat(positions[0].position as [number, number])
 			.addTo(map);
 
@@ -166,5 +167,6 @@ export const radiotower: Scenario = {
 	},
 	cleanupCustomBehavior: (_map, _setResults) => {
 		clearInterval(interval);
+		if (marker.remove) marker.remove();
 	},
 };

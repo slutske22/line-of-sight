@@ -37,6 +37,15 @@ export const Nav = () => {
 				<Button
 					key={scenario.title}
 					onClick={() => {
+						/**
+						 * Clean up all other custom behaviors before triggering this new scenario
+						 */
+						scenarios.forEach(sc => {
+							if (sc.cleanupCustomBehavior) {
+								sc.cleanupCustomBehavior(map, setResults);
+							}
+						});
+
 						setupScenario(map, scenario, setResults);
 					}}
 					style={{ borderTop: i === 0 ? "1px solid #393d48" : undefined }}
