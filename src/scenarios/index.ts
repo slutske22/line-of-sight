@@ -107,6 +107,8 @@ export const setupScenario = async (
 		},
 	};
 
+	const results = await lineOfSight(scenario.source, scenario.destination);
+
 	map.addSource("ground-line", {
 		type: "geojson",
 		data: origin2destinationGeoJson,
@@ -121,12 +123,10 @@ export const setupScenario = async (
 			"line-cap": "round",
 		},
 		paint: {
-			"line-color": "red",
+			"line-color": results.los ? "green" : "red",
 			"line-width": 2,
 		},
 	});
-
-	const results = await lineOfSight(scenario.source, scenario.destination);
 
 	setResults(results);
 
