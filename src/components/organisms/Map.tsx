@@ -19,7 +19,7 @@ const MapWrapper = styled.div`
 export const Map: React.FC = () => {
 	const [mapReady, setMapReady] = useState(false);
 
-	const { setMap } = useContext(DataContext);
+	const { map, setMap, results } = useContext(DataContext);
 
 	useEffect(() => {
 		if (!mapReady) return;
@@ -44,6 +44,16 @@ export const Map: React.FC = () => {
 
 		map.on("click", e => [console.log(e)]);
 	}, [mapReady]);
+
+	useEffect(() => {
+		if (map) {
+			map.setPaintProperty(
+				"ground-line",
+				"line-color",
+				results.los ? "green" : "red"
+			);
+		}
+	}, [map, results.los]);
 
 	return <MapWrapper ref={() => setMapReady(true)} id="map" />;
 };

@@ -69,6 +69,8 @@ export async function lineOfSight(
 	const tilenames = getTileNames(origin2destinationGeoJson.geometry, tileZoom);
 	await getDem(tilenames);
 
+	const altitude = start[2];
+
 	/**
 	 * Transform start and end LngLats into pixel values, according to
 	 * spherical mercator projection and defined zoom level
@@ -111,7 +113,9 @@ export async function lineOfSight(
 		height,
 	]);
 
-	const first = elevationProfile[0];
+	const first = altitude
+		? [elevationProfile[0][0], altitude]
+		: elevationProfile[0];
 	const last = elevationProfile[elevationProfile.length - 1];
 
 	const m = (first[1] - last[1]) / (first[0] - last[0]);
@@ -120,11 +124,13 @@ export async function lineOfSight(
 	for (let i = 0; i < elevationProfile.length; i++) {
 		losLine.push([
 			elevationProfile[i][0],
-			elevationProfile[0][1] + m * elevationProfile[i][0],
+			elevationProfile[0][1] +
+				m * elevationProfile[i][0] +
+				(altitude ? altitude : 0),
 		]);
 	}
 
-	const los = elevationProfile.some((point, i) => point[1] < losLine[i][1]);
+	const los = !elevationProfile.some((point, i) => point[1] > losLine[i][1]);
 
 	return {
 		elevationProfile,

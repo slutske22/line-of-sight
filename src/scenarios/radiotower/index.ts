@@ -25,6 +25,11 @@ const planepath = planepathjson as unknown as FeatureCollection<
 >;
 
 /**
+ * Altitude of the plane in meters
+ */
+const ALTITUDE = 750;
+
+/**
  * Target destination as geojson
  */
 const destination: FeatureCollection<Point> = {
@@ -52,7 +57,8 @@ const allGeoJson: FeatureCollection = {
 /**
  * First transform geojson into leaflet latlng array
  */
-const latLngs = planepath.features[0].geometry.coordinates[0] as Position[];
+const latLngs =
+	planepath.features[0].geometry.coordinates[0].reverse() as Position[];
 
 /**
  * Smooth out the path using turf bezier spline
@@ -78,7 +84,7 @@ export const radiotower: Scenario = {
 		center: [-157.8103446269198, 21.350181086214107],
 		zoom: 12,
 	},
-	source: positions[0].position,
+	source: [...positions[0].position, ALTITUDE],
 	destination: DESTINATION,
 	customBehavior: async (map, setResults) => {
 		/**
@@ -158,7 +164,10 @@ export const radiotower: Scenario = {
 				},
 			});
 
-			const result = await lineOfSight(positions[index].position, DESTINATION);
+			const result = await lineOfSight(
+				[...positions[index].position, ALTITUDE],
+				DESTINATION
+			);
 
 			setResults(result);
 
@@ -167,6 +176,6 @@ export const radiotower: Scenario = {
 	},
 	cleanupCustomBehavior: (_map, _setResults) => {
 		clearInterval(interval);
-		if (marker.remove) marker.remove();
+		marker?.remove();
 	},
 };
