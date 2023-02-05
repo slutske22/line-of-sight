@@ -15,7 +15,7 @@ const merc = new SphericalMercator({
 	antimeridian: true,
 });
 
-interface Options {
+export interface LineOfSightOptions {
 	/**
 	 * Whether to calculate sub-zero heights, or treat as 0
 	 */
@@ -50,7 +50,7 @@ export interface Results {
 export async function lineOfSight(
 	start: Position,
 	end: Position,
-	options?: Options
+	options?: LineOfSightOptions
 ): Promise<Results> {
 	const { considerBathymetry = false, tileZoom = config.TILE_ZOOM } =
 		options ?? {};
@@ -69,7 +69,8 @@ export async function lineOfSight(
 	const tilenames = getTileNames(origin2destinationGeoJson.geometry, tileZoom);
 	await getDem(tilenames);
 
-	const altitude = start[2];
+	const startAltitude = start[2];
+	const endAltitude = end[2];
 
 	/**
 	 * Transform start and end LngLats into pixel values, according to
@@ -113,10 +114,15 @@ export async function lineOfSight(
 		height,
 	]);
 
-	const first = altitude
-		? [elevationProfile[0][0], altitude]
-		: elevationProfile[0];
-	const last = elevationProfile[elevationProfile.length - 1];
+	const first =
+		startAltitude || startAltitude === 0
+			? [elevationProfile[0][0], startAltitude]
+			: elevationProfile[0];
+
+	const last =
+		endAltitude || endAltitude === 0
+			? [elevationProfile[elevationProfile.length - 1][0], endAltitude]
+			: elevationProfile[elevationProfile.length - 1];
 
 	const m = (first[1] - last[1]) / (first[0] - last[0]);
 
@@ -124,9 +130,7 @@ export async function lineOfSight(
 	for (let i = 0; i < elevationProfile.length; i++) {
 		losLine.push([
 			elevationProfile[i][0],
-			elevationProfile[0][1] +
-				m * elevationProfile[i][0] +
-				(altitude ? altitude : 0),
+			first[1] + m * elevationProfile[i][0],
 		]);
 	}
 

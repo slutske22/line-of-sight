@@ -81,8 +81,9 @@ export const radiotower: Scenario = {
 	title: "Radio Tower",
 	subtitle: "Air to Ground, in Motion",
 	startingView: {
-		center: [-157.8103446269198, 21.350181086214107],
-		zoom: 12,
+		center: { lng: -157.77804436552205, lat: 21.336150930713714 },
+		zoom: 10,
+		bearing: 0,
 	},
 	source: [...positions[0].position, ALTITUDE],
 	destination: DESTINATION,

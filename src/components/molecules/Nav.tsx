@@ -38,7 +38,7 @@ export const Nav = () => {
 					key={scenario.title}
 					onClick={() => {
 						/**
-						 * Clean up all other custom behaviors before triggering this new scenario
+						 * Clean up all custom behaviors before triggering this new scenario
 						 */
 						scenarios.forEach(sc => {
 							if (sc.cleanupCustomBehavior) {

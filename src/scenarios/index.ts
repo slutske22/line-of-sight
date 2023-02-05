@@ -1,8 +1,9 @@
 import { LngLatLike, Map } from "mapbox-gl";
 import { Position, GeoJSON } from "geojson";
-import { lineOfSight, Results } from "lib/lineofsight";
+import { lineOfSight, LineOfSightOptions, Results } from "lib/lineofsight";
 import * as beacons from "./beacons";
 import { radiotower } from "./radiotower";
+import { batyhmetry } from "./bathymetry";
 
 export interface Scenario {
 	/**
@@ -29,6 +30,10 @@ export interface Scenario {
 	 * The destination point we are trying to calculate line of sight to
 	 */
 	destination: Position;
+	/**
+	 * Options to pass to the line of sight function
+	 */
+	options?: LineOfSightOptions;
 	/**
 	 * Any special behavior the scenario should execute
 	 */
@@ -65,13 +70,7 @@ export const scenarios: Scenario[] = [
 		source: beacons.source,
 		destination: beacons.destination,
 	},
-	{
-		title: "Submarine",
-		subtitle: "Bathymetric",
-		startingView: beacons.view,
-		source: beacons.source,
-		destination: beacons.destination,
-	},
+	batyhmetry,
 ];
 
 /**
@@ -107,7 +106,11 @@ export const setupScenario = async (
 		},
 	};
 
-	const results = await lineOfSight(scenario.source, scenario.destination);
+	const results = await lineOfSight(
+		scenario.source,
+		scenario.destination,
+		scenario.options
+	);
 
 	map.addSource("ground-line", {
 		type: "geojson",
