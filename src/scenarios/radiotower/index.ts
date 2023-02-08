@@ -1,7 +1,7 @@
 import { LineString, lineString } from "@turf/helpers";
 import { FeatureCollection, Point, Polygon, Position } from "geojson";
 import { Scenario } from "scenarios";
-import { geojson2flightpath } from "utils";
+import { createMarker, geojson2flightpath } from "utils";
 import { GeoJSONSource, Marker } from "mapbox-gl";
 import bezier from "@turf/bezier-spline";
 import bbox from "@turf/bbox";
@@ -15,7 +15,7 @@ import PlaneIcon from "./plane-icon.png";
 /**
  * Coordinates for the target destination
  */
-const DESTINATION = [-157.7694392095103, 21.44933977381804];
+const DESTINATION = [-157.7694392095103, 21.44933977381804, 75];
 
 /**
  * The GeoJSON path of the plane
@@ -124,17 +124,10 @@ export const radiotower: Scenario = {
 
 		await getDem(tiles.map(({ x, y, z }) => [x, y, z]));
 
-		const el = document.createElement("div");
-		el.className = "plane-icon-wrapper";
-
-		const planeIcon = document.createElement("img");
-		planeIcon.src = PlaneIcon;
-		planeIcon.id = "plane-icon";
-		planeIcon.style.rotate = `${map.getBearing() - positions[0].bearing}deg`;
-
-		el.appendChild(planeIcon);
-
-		marker = new Marker(el)
+		marker = createMarker({
+			iconPath: PlaneIcon,
+			id: "plane-icon",
+		})
 			.setLngLat(positions[0].position as [number, number])
 			.addTo(map);
 
@@ -146,9 +139,10 @@ export const radiotower: Scenario = {
 			 * Set the position and rotation of the plane icon
 			 */
 			marker.setLngLat(positions[index].position as [number, number]);
-			planeIcon.style.rotate = `${
-				positions[index].bearing - map.getBearing()
-			}deg`;
+			const icon = marker.getElement().querySelector("img");
+			if (icon) {
+				icon.style.rotate = `${positions[index].bearing - map.getBearing()}deg`;
+			}
 
 			/**
 			 * Update the line of sight line to go betwen plane and target

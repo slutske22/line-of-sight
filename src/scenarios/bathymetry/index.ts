@@ -1,4 +1,11 @@
+import { Marker } from "mapbox-gl";
 import { Scenario } from "scenarios";
+import { createMarker } from "utils";
+import SubmarineIcon from "./submarine.svg";
+import BoatIcon from "./boat.svg";
+
+let submarineMarker: Marker;
+let boatMarker: Marker;
 
 export const batyhmetry: Scenario = {
 	title: "Submarine",
@@ -8,8 +15,8 @@ export const batyhmetry: Scenario = {
 		zoom: 9,
 		bearing: 0,
 	},
-	source: [-157.25994396989591, 20.931003669240553, -1000],
-	destination: [-157.6957750616636, 21.17524483750961, 0],
+	source: [-157.6957750616636, 21.17524483750961, 0],
+	destination: [-157.25994396989591, 20.931003669240553, -1000],
 	options: {
 		considerBathymetry: true,
 	},
@@ -28,11 +35,29 @@ export const batyhmetry: Scenario = {
 		});
 
 		map.moveLayer("ground-line");
+
+		submarineMarker = createMarker({
+			iconPath: SubmarineIcon,
+			id: "sub-icon",
+		})
+			.setLngLat([-157.25994396989591, 20.931003669240553])
+			.addTo(map);
+
+		boatMarker = createMarker({
+			iconPath: BoatIcon,
+			id: "boat-icon",
+		})
+			.setLngLat([-157.6957750616636, 21.17524483750961])
+			.addTo(map);
 	},
+
 	cleanupCustomBehavior: map => {
 		if (map.getLayer("bathymetry-raster")) {
 			map.removeLayer("bathymetry-raster");
 			map.removeSource("bathymetry-raster");
+
+			submarineMarker?.remove();
+			boatMarker?.remove();
 		}
 	},
 };
