@@ -42,7 +42,10 @@ export const Map: React.FC = () => {
 		// @ts-expect-error for debugging
 		window.map = map;
 
-		map.on("click", e => [console.log(e)]);
+		map.on("click", e => {
+			console.log(e);
+			console.log([e.lngLat.lng, e.lngLat.lat]);
+		});
 	}, [mapReady]);
 
 	useEffect(() => {
