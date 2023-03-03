@@ -1,7 +1,76 @@
-export const view = {
-	center: { lng: 173.7660329756265, lat: -41.065821362043756 },
-	zoom: 10,
-};
+import { lineOfSight, Results } from "lib/lineofsight";
+import { GeoJSONSource } from "mapbox-gl";
+import { Scenario } from "scenarios";
+import length from "@turf/length";
+import { GeoJSON } from "geojson";
 
-export const destination = [173.6865235396258, -41.13489194896242];
-export const source = [173.8178648959322, -40.89767230215723];
+export const beacons: Scenario = {
+	title: "Light the Beacons",
+	subtitle: "Ground to Ground",
+	startingView: {
+		center: { lng: -156.8689024974429, lat: 21.105369994433644 },
+		zoom: 10,
+		bearing: 0,
+	},
+	source: [-156.72926450297342, 21.151428547423208],
+	destination: [-156.8689024974429, 21.105369994433644],
+	customBehavior: async (map, setResults) => {
+		const points = [
+			[-156.84950223780203, 21.13404912215607],
+			[-156.81380187865813, 21.127785849952247],
+			[-156.79332517436342, 21.15785512296516],
+			[-156.72926450297342, 21.151428547423208],
+		];
+
+		const rays: Results[] = [];
+
+		for (let i = 0; i < points.length - 1; i++) {
+			let ray = await lineOfSight(points[i], points[i + 1]);
+
+			/**
+			 * If we are creating LoS for any ray except the first, we need to add
+			 * the distance of all previous rays to get the x-offset of the graph correct
+			 */
+			if (i > 0) {
+				const previousPath: GeoJSON = {
+					type: "Feature",
+					properties: {},
+					geometry: {
+						type: "LineString",
+						coordinates: points.filter((p, ind) => ind <= i),
+					},
+				};
+
+				const prevDistance = length(previousPath) * 1000;
+
+				ray = {
+					elevationProfile: ray.elevationProfile.map(([x, y]) => [
+						x + prevDistance,
+						y,
+					]),
+					losLine: ray.losLine.map(([x, y]) => [x + prevDistance, y]),
+					los: ray.los,
+				};
+			}
+
+			rays.push(ray);
+		}
+
+		const result: Results = {
+			elevationProfile: rays.map(r => r.elevationProfile).flat(),
+			losLine: rays.map(r => r.losLine).flat(),
+			los: rays.every(r => r.los),
+		};
+
+		(map.getSource("ground-line") as GeoJSONSource).setData({
+			type: "Feature",
+			properties: {},
+			geometry: {
+				type: "LineString",
+				coordinates: points,
+			},
+		});
+
+		setResults(result);
+	},
+};

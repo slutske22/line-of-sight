@@ -1,7 +1,7 @@
 import { LngLatLike, Map } from "mapbox-gl";
 import { Position, GeoJSON } from "geojson";
 import { lineOfSight, LineOfSightOptions, Results } from "lib/lineofsight";
-import * as beacons from "./beacons";
+import { beacons } from "./beacons";
 import { radiotower } from "./radiotower";
 import { batyhmetry } from "./bathymetry";
 
@@ -51,22 +51,12 @@ export interface Scenario {
 }
 
 export const scenarios: Scenario[] = [
-	{
-		title: "Light the Beacons",
-		subtitle: "Ground to Ground",
-		startingView: {
-			center: { lng: 173.768832412135, lat: -40.99157323594519 },
-			zoom: 10,
-			bearing: -45,
-		},
-		source: [173.6865235396258, -41.12975102937678],
-		destination: [173.80549394420922, -40.87416361138374],
-	},
+	beacons,
 	radiotower,
 	{
 		title: "Lighthouse",
 		subtitle: "Water to Ground",
-		startingView: beacons.view,
+		startingView: beacons.startingView,
 		source: beacons.source,
 		destination: beacons.destination,
 	},

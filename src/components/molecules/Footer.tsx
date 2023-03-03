@@ -19,6 +19,9 @@ export const Footer: React.FC = () => {
 			type: "spline",
 			backgroundColor: "none",
 			height: 230,
+			zooming: {
+				type: "x",
+			},
 		},
 		credits: {
 			enabled: false,

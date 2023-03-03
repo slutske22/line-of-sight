@@ -55,9 +55,8 @@ export const batyhmetry: Scenario = {
 		if (map.getLayer("bathymetry-raster")) {
 			map.removeLayer("bathymetry-raster");
 			map.removeSource("bathymetry-raster");
-
-			submarineMarker?.remove();
-			boatMarker?.remove();
 		}
+		submarineMarker?.remove();
+		boatMarker?.remove();
 	},
 };
