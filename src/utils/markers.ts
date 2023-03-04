@@ -6,6 +6,7 @@ import { Marker } from "mapbox-gl";
 export const createMarker = (options: {
 	iconPath: string;
 	id: string;
+	className?: string;
 }): Marker => {
 	const el = document.createElement("div");
 	el.className = "map-icon-wrapper";
@@ -13,6 +14,9 @@ export const createMarker = (options: {
 	const icon = document.createElement("img");
 	icon.src = options.iconPath;
 	icon.id = options.id;
+	if (options.className) {
+		icon.classList.add(options.className);
+	}
 
 	el.appendChild(icon);
 

@@ -1,8 +1,12 @@
 import { lineOfSight, Results } from "lib/lineofsight";
-import { GeoJSONSource } from "mapbox-gl";
+import { GeoJSONSource, Marker } from "mapbox-gl";
 import { Scenario } from "scenarios";
 import length from "@turf/length";
 import { GeoJSON } from "geojson";
+import { createMarker } from "utils";
+import FlameIcon from "./flame.png";
+
+const flameMarkers: Marker[] = [];
 
 export const beacons: Scenario = {
 	title: "Light the Beacons",
@@ -79,6 +83,21 @@ export const beacons: Scenario = {
 			},
 		});
 
+		points.forEach((point, i) => {
+			const marker = createMarker({
+				iconPath: FlameIcon,
+				id: `flame-marker-${i}`,
+				className: "flame-marker",
+			})
+				.setLngLat(point as [number, number])
+				.addTo(map);
+
+			flameMarkers.push(marker);
+		});
+
 		setResults(result);
+	},
+	cleanupCustomBehavior: () => {
+		flameMarkers.forEach(marker => marker.remove());
 	},
 };

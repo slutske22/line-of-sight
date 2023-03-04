@@ -23,4 +23,9 @@ body {
 .map-icon-wrapper img {
 	height: 64px;
 	width: 64px;
+
+	&.flame-marker {
+		height: 24px;
+		width: 24px;
+	}
 }
