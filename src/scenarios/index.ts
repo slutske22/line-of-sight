@@ -4,6 +4,7 @@ import { lineOfSight, LineOfSightOptions, Results } from "lib/lineofsight";
 import { beacons } from "./beacons";
 import { radiotower } from "./radiotower";
 import { batyhmetry } from "./bathymetry";
+import { lighthouse } from "./lighthouse";
 
 export interface Scenario {
 	/**
@@ -53,13 +54,7 @@ export interface Scenario {
 export const scenarios: Scenario[] = [
 	beacons,
 	radiotower,
-	{
-		title: "Lighthouse",
-		subtitle: "Water to Ground",
-		startingView: beacons.startingView,
-		source: beacons.source,
-		destination: beacons.destination,
-	},
+	lighthouse,
 	batyhmetry,
 ];
 
