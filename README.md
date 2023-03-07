@@ -4,25 +4,22 @@ This project is a proof of concept for calculating whether or not there is line 
 
 ## Considering Earth's curvature
 
-At large distances, the curvature of the earth may interfere with an otherwise direct line of sight.
+At large distances, the curvature of the earth may interfere with an otherwise direct line of sight. The height offset of $d$, along the _arc_ $\overset{\huge\frown}{AB}$ is represented by $y_r$ in this diagram:
 
 <p align="center">
 <img src="./images/earth-diagram.png" />
 </p>
 
-To find the vertical bulge of the earch between 2 points, we can use the [following formula](https://www.themathdoctors.org/how-much-does-the-earth-curve/):
+The formula for this height $y_r$ as a function of the distance $d$ is:
 
-$$ -y = R + \frac{\sqrt{4R^2 - L^2}}{2} $$
+$$
 
-Where $L$ is the distance between $A$ and $B$. If $L$ is small compared to $R$, the following approximation works as well:
+y_r = R \left( 1 - \dfrac{ \cos \left( \dfrac{\theta*{AB}}{2} \right) }{ \cos \left( \dfrac{\theta\_{AB}}{2} - \theta \right) } \right)
 
-$$ y = -L^2 / 8R $$
 
-This math assumes you know the direct distance $L$. But in the case of measuring distances on earth, we often don't know the direct distance (the _chord_), but rather the distance along the curvature of the earth's surface, which is arc $\overline{AB}$. The chord length can be derived from the arc length with [this formula](https://www.vcalc.com/wiki/chord-length-from-arc-length-and-radius):
+$$
 
-$$ L = 2R \cdot sin(\frac{\overline{AB}}{2R}) $$
-
-In order to find the height of the earth's bulge at every pixel along a line between 2 points, we would have to call the `Math.sin` function as many times as there are pixels. Considering `Math.sin` is very [computationally demanding](https://stackoverflow.com/questions/2479517/is-trigonometry-computationally-expensive), it may be useful in the code to use a [sin approximation function](https://datagenetics.com/blog/july12019/index.html) instead.
+Where $\theta = \frac{d}{R}$. Ths discussion that spawned this formula can be found [here](https://math.stackexchange.com/questions/4653429/height-of-circle-bulge-along-given-arc/4653616). In scenarios where earth's curvature is calculated, every pixel at a distance $d$ the line between two points includes the term $y_r(d)$.
 
 ---
 
