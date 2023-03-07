@@ -2,7 +2,7 @@ import { Position, GeoJSON } from "geojson";
 import SphericalMercator from "@mapbox/sphericalmercator";
 import { dem, tilename } from "dem";
 import length from "@turf/length";
-import { bulge2, line } from "utils";
+import { bulge, line } from "utils";
 import {
 	getDem,
 	getTileCoordOfProjectedPoint,
@@ -132,7 +132,7 @@ export async function lineOfSight(
 					})
 				);
 
-				earthCurvatureOffset = bulge2(distance, distanceFromStartToThisPoint);
+				earthCurvatureOffset = bulge(distance, distanceFromStartToThisPoint);
 			}
 
 			let height = considerBathymetry ? elevation : Math.max(0, elevation);
