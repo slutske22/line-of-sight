@@ -8,5 +8,9 @@ export const lighthouse: Scenario = {
 	startingView: {
 		center: [-158.28149742326337, 21.574992201741413],
 		zoom: 10,
+		bearing: 0,
+	},
+	options: {
+		considerEarthCurvature: true,
 	},
 };

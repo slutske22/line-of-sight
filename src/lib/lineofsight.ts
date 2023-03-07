@@ -2,7 +2,7 @@ import { Position, GeoJSON } from "geojson";
 import SphericalMercator from "@mapbox/sphericalmercator";
 import { dem, tilename } from "dem";
 import length from "@turf/length";
-import { line } from "utils";
+import { bulge2, line } from "utils";
 import {
 	getDem,
 	getTileCoordOfProjectedPoint,
@@ -20,6 +20,10 @@ export interface LineOfSightOptions {
 	 * Whether to calculate sub-zero heights, or treat as 0
 	 */
 	considerBathymetry?: boolean;
+	/**
+	 * Whether or not to include earth's curvature in height calculations
+	 */
+	considerEarthCurvature?: boolean;
 	/**
 	 * Zoom level to use when getting DEM and analyzing pixels
 	 */
@@ -52,8 +56,11 @@ export async function lineOfSight(
 	end: Position,
 	options?: LineOfSightOptions
 ): Promise<Results> {
-	const { considerBathymetry = false, tileZoom = config.TILE_ZOOM } =
-		options ?? {};
+	const {
+		considerBathymetry = false,
+		considerEarthCurvature = false,
+		tileZoom = config.TILE_ZOOM,
+	} = options ?? {};
 
 	const origin2destinationGeoJson: GeoJSON = {
 		type: "Feature",
@@ -105,7 +112,36 @@ export async function lineOfSight(
 
 			const elevation = config.heightFunction(r, g, b);
 
-			return considerBathymetry ? elevation : Math.max(0, elevation);
+			let earthCurvatureOffset = 0;
+			if (considerEarthCurvature) {
+				const latLngOfPixel = merc.ll([pixel.x, pixel.y], tileZoom);
+
+				const origin2ThisPointGeoJson: GeoJSON = {
+					type: "Feature",
+					properties: {},
+					geometry: {
+						type: "LineString",
+						coordinates: [start, latLngOfPixel],
+					},
+				};
+
+				// Round down to reduce floating point CPU load in step that follows
+				const distanceFromStartToThisPoint = Math.floor(
+					length(origin2ThisPointGeoJson, {
+						units: "meters",
+					})
+				);
+
+				earthCurvatureOffset = bulge2(distance, distanceFromStartToThisPoint);
+			}
+
+			let height = considerBathymetry ? elevation : Math.max(0, elevation);
+
+			if (considerEarthCurvature) {
+				height = height + earthCurvatureOffset;
+			}
+
+			return height;
 		})
 		.filter(result => result !== null) as number[];
 
