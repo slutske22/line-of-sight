@@ -12,7 +12,7 @@ export const beacons: Scenario = {
 	title: "Light the Beacons",
 	subtitle: "Ground to Ground",
 	startingView: {
-		center: { lng: -156.8689024974429, lat: 21.105369994433644 },
+		center: { lng: -156.99517313692127, lat: 21.135450172240212 },
 		zoom: 10,
 		bearing: 0,
 	},
