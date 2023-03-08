@@ -10,6 +10,22 @@ Several factors contribute to whether or not there is direct line of sight betwe
 - Structures and Buildings
 - Earth's Curvature
 
+## Topography / Elevation Profile
+
+Global topography data is available in the form of RGB-encoded DEM via several sources. This PoC uses an [open dataset of bare-earth terrain tiles available via AWS S3](https://registry.opendata.aws/terrain-tiles/). A single tile contains elevation data encoded in RGB:
+
+<p align="center">
+<img src="./images/tile-1.png" />
+</p>
+
+We can determine what `{x}/{y}/{z}` tiles lie along the line between 2 latlng points. Once downloaded, the exact `[x, y]` pixel positions along each tile is calculated using the [Bresenham algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm). The RGB value of each pixel is extracted from the image:
+
+<p align="center">
+<img src="./images/tile-3.png" />
+</p>
+
+Using the appropriate height function, we convert the RGB value into an elevation for each pixel, which creates a topographical elevation profile between the original 2 points.
+
 ## Considering Earth's curvature
 
 At large distances, the curvature of the earth may interfere with an otherwise direct line of sight. The height offset of $d$, along the _arc_ $\overset{\huge\frown}{AB}$ is represented by $y_r$ in this diagram:
