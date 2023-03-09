@@ -36,12 +36,7 @@ At large distances, the curvature of the earth may interfere with an otherwise d
 
 The formula for this height $y_r$ as a function of the distance $d$ is:
 
-$$
-
-y_r = R \left( 1 - \dfrac{ \cos \left( \dfrac{\theta*{AB}}{2} \right) }{ \cos \left( \dfrac{\theta\_{AB}}{2} - \theta \right) } \right)
-
-
-$$
+$$ y_r = R \left( 1 - \dfrac{ \cos \left( \dfrac{\theta*{AB}}{2} \right) }{ \cos \left( \dfrac{\theta\_{AB}}{2} - \theta \right) } \right) $$
 
 Where $\theta = \frac{d}{R}$. Ths discussion that spawned this formula can be found [here](https://math.stackexchange.com/questions/4653429/height-of-circle-bulge-along-given-arc/4653616). In scenarios where earth's curvature is calculated, every pixel at a distance $d$ the line between two points includes the term $y_r(d)$.
 
