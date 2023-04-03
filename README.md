@@ -1,6 +1,8 @@
 <p align="center">
-<h1 align="center">Line of Sight</h1>
-<img src="./images/line-of-sight-logo-sm.png" />
+  <h1 align="center">Line of Sight</h1>
+</p>
+<p align="center">
+  <img src="./images/line-of-sight-logo-sm.png" />
 </p>
 
 This project is a proof of concept for calculating whether or not there is line of sight between 2 points on the earth. While there are other tools to achieve this goal, this project aims to do so at lightning speed, while the origin and/or target are in motion.
