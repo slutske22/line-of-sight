@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button as ButtonBase } from "components/atoms";
 import styled from "styled-components";
 import { DataContext } from "components/organisms";
@@ -18,10 +18,24 @@ const Button = styled(ButtonBase)`
 	border-bottom: 1px solid darkgrey;
 	flex-direction: column;
 	align-items: flex-start;
+	color: #ffffff;
+	transition: all 200ms;
+
+	&.active {
+		color: #b8fff8;
+		transition: all 200ms;
+	}
 `;
 
 const H3 = styled.h3`
 	margin: 0;
+	color: #ffffff;
+	transition: all 200ms;
+
+	&.active {
+		color: #b8fff8;
+		transition: all 200ms;
+	}
 `;
 
 const Description = styled.div`
@@ -43,7 +57,14 @@ const Description = styled.div`
  */
 export const Nav: React.FC = () => {
 	const { map, setResults } = useContext(DataContext);
-	const [scenario, setScenario] = useState<Scenario>();
+	const [currentScenario, setCurrentScenario] = useState<Scenario>();
+
+	useEffect(() => {
+		if (map) {
+			setupScenario(map, scenarios[0], setResults);
+			setCurrentScenario(scenarios[0]);
+		}
+	}, [map]);
 
 	return (
 		<Wrapper>
@@ -62,18 +83,25 @@ export const Nav: React.FC = () => {
 						});
 
 						setupScenario(map, scenario, setResults);
-						setScenario(scenario);
+						setCurrentScenario(scenario);
 					}}
 					style={{ borderTop: i === 0 ? "1px solid #393d48" : undefined }}
+					className={currentScenario?.title === scenario.title ? "active" : ""}
 				>
-					<H3>{scenario.title}</H3>
+					<H3
+						className={
+							currentScenario?.title === scenario.title ? "active" : ""
+						}
+					>
+						{scenario.title}
+					</H3>
 					{scenario.subtitle}
 				</Button>
 			))}
 
-			{scenario && (
+			{currentScenario && (
 				<Description
-					dangerouslySetInnerHTML={{ __html: scenario?.description }}
+					dangerouslySetInnerHTML={{ __html: currentScenario?.description }}
 				/>
 			)}
 		</Wrapper>

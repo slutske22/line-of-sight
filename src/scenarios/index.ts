@@ -56,8 +56,8 @@ export interface Scenario {
 }
 
 export const scenarios: Scenario[] = [
-	beacons,
 	radiotower,
+	beacons,
 	lighthouse,
 	batyhmetry,
 ];
