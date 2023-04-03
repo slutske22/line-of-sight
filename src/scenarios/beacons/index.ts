@@ -11,6 +11,8 @@ const flameMarkers: Marker[] = [];
 export const beacons: Scenario = {
 	title: "Light the Beacons",
 	subtitle: "Ground to Ground",
+	description:
+		"This scenario demonstrates using line of sight to communicate across a mountain range, using a series of intermediate, strategically placed points.",
 	startingView: {
 		center: { lng: -156.99517313692127, lat: 21.135450172240212 },
 		zoom: 10,

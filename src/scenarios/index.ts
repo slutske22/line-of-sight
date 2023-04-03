@@ -16,6 +16,10 @@ export interface Scenario {
 	 */
 	subtitle: string;
 	/**
+	 * Description to show in the UI
+	 */
+	description: string;
+	/**
 	 * What view the map should start on for the scenario
 	 */
 	startingView: {

@@ -80,6 +80,8 @@ let marker: Marker;
 export const radiotower: Scenario = {
 	title: "Radio Tower",
 	subtitle: "Air to Ground, in Motion",
+	description:
+		"A plane flying at 750m altitude tries to maintain line of sight through the Koolau mountain range.  Position and line of sight refreshes at a rate of ~3hz, and as all DEM data in the flight path is already preloaded and preprocessed, there is no lag in calculating the elevation profile or line of sight.",
 	startingView: {
 		center: { lng: -157.77804436552205, lat: 21.336150930713714 },
 		zoom: 10,

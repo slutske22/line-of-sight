@@ -10,6 +10,8 @@ let boatMarker: Marker;
 export const batyhmetry: Scenario = {
 	title: "Submarine",
 	subtitle: "Bathymetric",
+	description:
+		"Bathymetric depths can be used to determine line of sight under water.  In this scenario, a submarine's communication with a surface-level ship is obscured by Penguin Bank, an underwater shield volcano.",
 	startingView: {
 		center: { lng: -157.49400319946662, lat: 21.0620539193483 },
 		zoom: 9,
