@@ -1,4 +1,7 @@
-# Line of Sight
+<p align="center">
+<h1 align="center">Line of Sight</h1>
+<img src="./images/line-of-sight-logo.png" />
+</p>
 
 This project is a proof of concept for calculating whether or not there is line of sight between 2 points on the earth. While there are other tools to achieve this goal, this project aims to do so at lightning speed, while the origin and/or target are in motion.
 
@@ -25,6 +28,8 @@ We can determine what `{x}/{y}/{z}` tiles lie along the line between 2 latlng po
 </p>
 
 Using the appropriate height function, we convert the RGB value into an elevation for each pixel, which creates a topographical elevation profile between the original 2 points.
+
+Using methods similar to [leaflet-topography](https://github.com/slutske22/leaflet-topography#cacheing-tiles), each tile is kept in local memory in the form of an [ndarray](https://github.com/scijs/ndarray). With DEM data already in memory, subsequent line-of-sight calculations in the same area do not require additional api calls.
 
 ## Considering Earth's curvature
 
