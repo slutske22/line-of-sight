@@ -49,7 +49,7 @@ export const Map: React.FC = () => {
 	}, [mapReady]);
 
 	useEffect(() => {
-		if (map) {
+		if (map && map.getLayer("ground-line")) {
 			map.setPaintProperty(
 				"ground-line",
 				"line-color",
