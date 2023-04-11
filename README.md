@@ -50,6 +50,11 @@ $$ y_r = R \left( 1 - \dfrac{ \cos \left( \dfrac{\theta*{AB}}{2} \right) }{ \cos
 
 Where $\theta = \frac{d}{R}$. Ths discussion that spawned this formula can be found [here](https://math.stackexchange.com/questions/4653429/height-of-circle-bulge-along-given-arc/4653616). In scenarios where earth's curvature is calculated, every pixel at a distance $d$ the line between two points includes the term $y_r(d)$.
 
+## TODOs
+
+- Include buildings using OSM building tiles
+- Create an open playground feature
+
 ---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
