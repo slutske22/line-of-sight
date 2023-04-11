@@ -7,6 +7,9 @@
 
 This project is a proof of concept for calculating whether or not there is line of sight between 2 points on the earth. While there are other tools to achieve this goal, this project aims to do so at lightning speed, while the origin and/or target are in motion.
 
+<h1 align="center"><a href="https://slutske22.github.io/line-of-sight/" target="_blank">👀 View the Project 👀</a></h1>
+
+
 ## Methodology
 
 Several factors contribute to whether or not there is direct line of sight between two points on the globe:
