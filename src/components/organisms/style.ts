@@ -9,7 +9,7 @@ export const style: Style = {
 		osm: {
 			type: "raster",
 			tiles: [
-				"https://stamen-tiles-c.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.png",
+				"https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png",
 			],
 			tileSize: 256,
 			attribution: "&copy; OpenStreetMap Contributors",
